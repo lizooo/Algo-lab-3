@@ -18,8 +18,8 @@ class StructTest(unittest.TestCase):
         self.graph_to_test.add_edge(9, 10)
         self.graph_to_test.add_edge(2, 8)
 
-    def test_adj_matrix(self):
-        self.assertEqual(dict(self.graph_to_test.adjacency_matrix),
+    def test_adj_list(self):
+        self.assertEqual(dict(self.graph_to_test.adjacency_list),
                          {1: [4, 2, 3],
                           4: [5],
                           5: [6],
@@ -30,15 +30,12 @@ class StructTest(unittest.TestCase):
                           9: [10],
                           2: [8]})
 
-    def test_find_ancestors(self):
-        self.assertEqual(self.graph_to_test.find_ancestors(10), [8, 9])
-
     def test_find_mother(self):
         self.assertEqual(self.graph_to_test.find_mother(), 1)
 
-    def test_bfs(self):
-        self.assertEqual(self.graph_to_test.bfs(),
-                         [10, 8, 7, 6, 9, 5, 3, 2, 4, 1])
+    def test_dfs(self):
+        self.assertEqual(self.graph_to_test.dfs(),
+                         [10, 8, 7, 6, 5, 4, 2, 9, 3, 1])
 
 
 if __name__ == '__main__':
