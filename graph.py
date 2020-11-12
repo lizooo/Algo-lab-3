@@ -5,88 +5,55 @@ from graph_utils import *
 class Graph:
 
     def __init__(self):
-        self.adjacency_matrix = defaultdict(list)
+        self.adjacency_list = defaultdict(list)
 
-    def dfs_util(self, starting_vertex, visited):
+    def find_mother_util(self, starting_vertex, visited):
         visited.add(starting_vertex)
 
-        for neighbour in self.adjacency_matrix[starting_vertex]:
+        for neighbour in self.adjacency_list[starting_vertex]:
             if neighbour not in visited:
-                self.dfs_util(neighbour, visited)
+                self.find_mother_util(neighbour, visited)
+
+    def dfs_recursive_util(self, starting_vertex, visited, sequence):
+
+        if starting_vertex not in visited:
+            visited.add(starting_vertex)
+            for neighbour in self.adjacency_list[starting_vertex]:
+                self.dfs_recursive_util(neighbour, visited, sequence)
+                if neighbour not in sequence: sequence.append(neighbour)
+        return sequence
+
+    def dfs(self):
+        visited = set()
+        sequence = []
+        starting_vertex = self.find_mother()
+        self.dfs_recursive_util(starting_vertex, visited, sequence)
+        sequence.append(starting_vertex)
+        return sequence
 
     def add_edge(self, key, value):
         if isinstance(value, list):
-            self.adjacency_matrix[key] = value
-        else: self.adjacency_matrix[key].append(value)
-
-    def print_graph(self):
-        print(dict(self.adjacency_matrix))
-
-    def find_ancestors(self, vertex_to_process):
-        ancestors = []
-        for current_vertex in list(self.adjacency_matrix):
-            for neighbour in self.adjacency_matrix[current_vertex]:
-                if vertex_to_process == neighbour:
-                    ancestors.append(current_vertex)
-
-        return ancestors
+            self.adjacency_list[key] = value
+        else:
+            self.adjacency_list[key].append(value)
 
     def find_mother(self):
 
         visited = set()
         mother_vertex = ''
 
-        for vertex in list(self.adjacency_matrix):
+        for vertex in list(self.adjacency_list):
             if vertex not in visited:
-                self.dfs_util(vertex, visited)
+                self.find_mother_util(vertex, visited)
                 mother_vertex = vertex
 
-        self.dfs_util(mother_vertex, visited)
-        if len(visited) != len(self.adjacency_matrix):
+        self.find_mother_util(mother_vertex, visited)
+        if len(visited) != len(self.adjacency_list):
             return -1
         else:
             return mother_vertex
 
-    def bfs(self):
-
-        starting_vertex = self.find_mother()
-        visited = set()
-        queue = []
-        result = []
-
-        visited.add(starting_vertex)
-        queue.append(starting_vertex)
-
-        while queue:
-            current_vertex = queue.pop(0)
-            result.append(current_vertex)
-
-            for neighbour in self.adjacency_matrix[current_vertex]:
-                should_append = True
-                if neighbour not in visited:
-                    for ancestor in self.find_ancestors(neighbour):
-                        if ancestor not in visited:
-                            should_append = False
-                    if should_append:
-                        visited.add(neighbour)
-                        queue.append(neighbour)
-
-        return result[::-1]
-
 
 if __name__ == '__main__':
 
-    write_to_file('govern.out', build_graph('govern.in').bfs())
-
-
-
-
-
-
-
-
-
-
-
-
-
+    write_to_file('govern.out', build_graph('govern.in').dfs())
